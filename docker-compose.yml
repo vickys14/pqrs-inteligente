@@ -1,0 +1,63 @@
+services:
+  # ---------- DATA LAKE (compatible con S3) ----------
+  # MinIO retiro sus imagenes publicas en 2026, por eso usamos RustFS:
+  # mismo protocolo S3, mismos puertos y consola web, licencia Apache 2.0.
+  rustfs:
+    image: rustfs/rustfs:1.0.0
+    container_name: pqrs-datalake
+    environment:
+      RUSTFS_ACCESS_KEY: ${MINIO_ROOT_USER}
+      RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "9000:9000" # API S3
+      - "9001:9001" # Consola web
+    volumes:
+      - datalake_data:/data
+
+  # ---------- BASE DE DATOS ----------
+  postgres:
+    image: postgres:16
+    container_name: pqrs-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: pqrs
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d pqrs" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ---------- IA LOCAL (clasificador) ----------
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pqrs-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  # Descarga el modelo la primera vez (~2 GB)
+  ollama-init:
+    image: ollama/ollama:latest
+    container_name: pqrs-ollama-init
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: ollama:11434
+    entrypoint: >
+      /bin/sh -c " until ollama list; do sleep 3; done; ollama pull llama3.2:3b; exit 0; "
+    restart: "no"
+  # Los buckets (pqrs-raw, pqrs-reportes) los crea el codigo Python.
+  # El servicio "harness" se agrega en un paso posterior.
+
+volumes:
+  datalake_data:
+  pg_data:
+  ollama_data:
