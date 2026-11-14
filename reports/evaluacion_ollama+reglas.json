@@ -1,0 +1,110 @@
+{
+  "casos_evaluados": 30,
+  "precision": {
+    "tipo": 86.7,
+    "tema": 86.7,
+    "urgencia": 73.3,
+    "exacto": 50.0
+  },
+  "recall_urgencia_alta": 87.5,
+  "por_canal": {
+    "texto": {
+      "tipo": 70.0,
+      "tema": 90.0,
+      "urgencia": 80.0,
+      "exacto": 50.0,
+      "casos": 10
+    },
+    "audio": {
+      "tipo": 100.0,
+      "tema": 90.0,
+      "urgencia": 70.0,
+      "exacto": 60.0,
+      "casos": 10
+    },
+    "foto": {
+      "tipo": 90.0,
+      "tema": 80.0,
+      "urgencia": 70.0,
+      "exacto": 40.0,
+      "casos": 10
+    }
+  },
+  "errores": [
+    {
+      "archivo": "caso_007.txt",
+      "real": "queja/bienestar/alta",
+      "modelo": "peticion/bienestar/alta"
+    },
+    {
+      "archivo": "caso_016.txt",
+      "real": "reclamo/infraestructura/media",
+      "modelo": "peticion/infraestructura/baja"
+    },
+    {
+      "archivo": "caso_019.txt",
+      "real": "reclamo/tecnologia/alta",
+      "modelo": "reclamo/notas/alta"
+    },
+    {
+      "archivo": "caso_022.txt",
+      "real": "peticion/finanzas/media",
+      "modelo": "peticion/finanzas/baja"
+    },
+    {
+      "archivo": "caso_028.txt",
+      "real": "sugerencia/docentes/baja",
+      "modelo": "peticion/docentes/baja"
+    },
+    {
+      "archivo": "caso_002.mp3",
+      "real": "peticion/notas/media",
+      "modelo": "peticion/notas/baja"
+    },
+    {
+      "archivo": "caso_008.mp3",
+      "real": "peticion/servicios/baja",
+      "modelo": "peticion/notas/baja"
+    },
+    {
+      "archivo": "caso_017.mp3",
+      "real": "peticion/notas/media",
+      "modelo": "peticion/notas/baja"
+    },
+    {
+      "archivo": "caso_023.mp3",
+      "real": "queja/infraestructura/alta",
+      "modelo": "queja/infraestructura/media"
+    },
+    {
+      "archivo": "caso_006.png",
+      "real": "reclamo/notas/media",
+      "modelo": "reclamo/notas/alta"
+    },
+    {
+      "archivo": "caso_012.png",
+      "real": "reclamo/finanzas/media",
+      "modelo": "reclamo/servicios/media"
+    },
+    {
+      "archivo": "caso_015.png",
+      "real": "sugerencia/tecnologia/baja",
+      "modelo": "peticion/tecnologia/baja"
+    },
+    {
+      "archivo": "caso_018.png",
+      "real": "queja/servicios/baja",
+      "modelo": "queja/servicios/media"
+    },
+    {
+      "archivo": "caso_021.png",
+      "real": "reclamo/biblioteca/media",
+      "modelo": "reclamo/biblioteca/alta"
+    },
+    {
+      "archivo": "caso_024.png",
+      "real": "sugerencia/servicios/baja",
+      "modelo": "sugerencia/infraestructura/baja"
+    }
+  ]
+}

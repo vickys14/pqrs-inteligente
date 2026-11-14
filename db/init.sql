@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS pqrs_casos (
     urgencia        TEXT CHECK (urgencia IN ('baja', 'media', 'alta')),
     area_destino    TEXT,                   -- area responsable (Tesoreria, Registro, etc.)
     clasificador    TEXT,                   -- 'ollama' o 'claude'
+    fecha_recepcion DATE,                   -- fecha en que llego la PQRS
     creado_en       TIMESTAMP DEFAULT NOW()
 );
 

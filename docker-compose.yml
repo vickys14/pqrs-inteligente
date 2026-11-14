@@ -10,8 +10,8 @@ services:
       RUSTFS_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       RUSTFS_CONSOLE_ENABLE: "true"
     ports:
-      - "9000:9000" # API S3
-      - "9001:9001" # Consola web
+      - "9000:9000"   # API S3
+      - "9001:9001"   # Consola web
     volumes:
       - datalake_data:/data
 
@@ -29,7 +29,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d pqrs" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d pqrs"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -51,13 +51,50 @@ services:
       - ollama
     environment:
       OLLAMA_HOST: ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
     entrypoint: >
-      /bin/sh -c " until ollama list; do sleep 3; done; ollama pull llama3.2:3b; exit 0; "
+      /bin/sh -c "
+      until ollama list; do sleep 3; done;
+      ollama pull $${OLLAMA_MODEL:-llama3.2:3b};
+      exit 0;
+      "
     restart: "no"
-  # Los buckets (pqrs-raw, pqrs-reportes) los crea el codigo Python.
-  # El servicio "harness" se agrega en un paso posterior.
+
+  # ---------- HARNESS (procesamiento) ----------
+  # No arranca con "up -d". Se ejecuta a demanda:
+  #   docker compose run --rm harness
+  harness:
+    build: ./harness
+    container_name: pqrs-harness
+    profiles: ["harness"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rustfs:
+        condition: service_started
+      ollama:
+        condition: service_started
+    environment:
+      S3_ENDPOINT: http://rustfs:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: pqrs
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      CLASSIFIER: ${CLASSIFIER:-ollama}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      WHISPER_MODEL: small
+      URGENCIA_REGLAS: ${URGENCIA_REGLAS:-1}
+    volumes:
+      - whisper_cache:/root/.cache
+      - ./reports:/app/reports
+      - ./synthetic_data/etiquetas.csv:/app/etiquetas.csv:ro
 
 volumes:
   datalake_data:
   pg_data:
   ollama_data:
+  whisper_cache:

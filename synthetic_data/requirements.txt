@@ -1,0 +1,4 @@
+boto3>=1.34
+gTTS>=2.5
+Pillow>=10.1
+python-dotenv>=1.0

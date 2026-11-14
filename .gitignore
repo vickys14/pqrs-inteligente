@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+synthetic_data/output/
+synthetic_data/.venv/
